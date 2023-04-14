@@ -185,11 +185,12 @@ def draw_window(SCORE , VELOCITY , ARROWS_LINE_NUMBER , all_sprites):
     render_text = main_font.render(f"Arrows : {SCORE}" , 1 , BLACK)
     WIN.blit(render_text , (10,10))
     # Draw scores text #
-    # Draw record #
-    main_font = pygame.font.Font(os.path.join("Assets" , "ComicSansMS3.ttf") , 30)
-    render_text = main_font.render(f"Record : {record}" , 1 , BLACK)
-    WIN.blit(render_text , (12,50))
-    # Draw record #
+    if record:
+        # Draw record #
+        main_font = pygame.font.Font(os.path.join("Assets" , "ComicSansMS3.ttf") , 30)
+        render_text = main_font.render(f"Record : {record}" , 1 , BLACK)
+        WIN.blit(render_text , (12,50))
+        # Draw record #
     update_arrows(ARROWS_LINE_NUMBER , all_sprites)
     all_sprites.draw(WIN)
     all_sprites.update(VELOCITY)
@@ -276,11 +277,12 @@ def draw_failure(SCORE , VELOCITY , ARROWS_LINE_NUMBER , all_sprites):
         # Draw scores text #
         all_sprites.draw(WIN)
 
-        # Draw record #
-        main_font = pygame.font.Font(os.path.join("Assets" , "ComicSansMS3.ttf") , 30)
-        render_text = main_font.render(f"Record : {record}" , 1 , BLACK)
-        WIN.blit(render_text , (12,50))
-        # Draw record #
+        if record:
+            # Draw record #
+            main_font = pygame.font.Font(os.path.join("Assets" , "ComicSansMS3.ttf") , 30)
+            render_text = main_font.render(f"Record : {record}" , 1 , BLACK)
+            WIN.blit(render_text , (12,50))
+            # Draw record #
         draw_text(f"You eliminated {SCORE} arrows !" , os.path.join("Assets" , "Courier.ttf") , 45 , WIDTH/2 , HEIGHT/2 , BLUE , 1)
         draw_text("Press Enter to play again" , os.path.join("Assets" , "Courier.ttf") , 35 , WIDTH/2 , HEIGHT*3/4 , BLUE , 1)
         if SOCLOSE:
