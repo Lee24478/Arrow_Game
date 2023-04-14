@@ -30,6 +30,8 @@ UP_DIRECTION = pygame.transform.rotate(DOWN_DIRECTION , 180)
 RIGHT_DIRECTION = pygame.transform.rotate(DOWN_DIRECTION , 90)
 MUTE = pygame.transform.scale(pygame.image.load(os.path.join("Assets" , "mute.png")) , (50,50))
 UNMUTE = pygame.transform.scale(pygame.image.load(os.path.join("Assets" , "unmute.png")) , (50,50))
+MUTE_WHITE = pygame.transform.scale(pygame.image.load(os.path.join("Assets" , "mute_rmbg.png")) , (50,50))
+UNMUTE_WHITE = pygame.transform.scale(pygame.image.load(os.path.join("Assets" , "unmute_rmbg.png")) , (50,50))
 ARROWS_SHOW_ON_INIT = pygame.transform.scale(pygame.image.load(os.path.join("Assets" , "direction.png")) , (80 , 80))
 
 # Load musics
@@ -197,7 +199,7 @@ def draw_window(SCORE , VELOCITY , ARROWS_LINE_NUMBER , all_sprites):
     pygame.display.update()
 
 def draw_init_screen():
-    global WIN , WIDTH , HEIGHT , F11_times
+    global WIN , WIDTH , HEIGHT , F11_times , sound_check , unmute_pos
     arrows_sprites = pygame.sprite.Group()
     for _ in range(20):
         arrows = Arrows()
@@ -213,6 +215,12 @@ def draw_init_screen():
         draw_text("Use arrow key to eliminate arrows" , os.path.join("Assets" , "Courier.ttf") , 35 , WIDTH/2 , HEIGHT/2 , GREEN)
         draw_text("Press Enter to start" , os.path.join("Assets" , "Courier.ttf") , 30 , WIDTH/2 , HEIGHT*2/3 , WHITE)
         draw_text("(Press Space to pause)" , os.path.join("Assets" , "Courier.ttf") , 25 , WIDTH/2 , HEIGHT*7/9 , WHITE)
+        draw_text("F11 : Full Screen" , os.path.join("Assets" , "ComicSansMS3.ttf") , 20 , WIDTH - 100 , 80 , WHITE)
+        draw_text("Esc : End the game" , os.path.join("Assets" , "ComicSansMS3.ttf") , 20 , WIDTH - 100 , 120 , WHITE)
+        if sound_check % 2:
+            WIN.blit(UNMUTE_WHITE , (WIDTH - UNMUTE.get_rect().width - 15 , 10))
+        else:
+            WIN.blit(MUTE_WHITE , (WIDTH - MUTE.get_rect().width - 15 , 10))
         pygame.display.update()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -226,16 +234,34 @@ def draw_init_screen():
                     if F11_times % 2:
                         WIDTH , HEIGHT = WIN_RESOLUTIONS.current_w - 700 , WIN_RESOLUTIONS.current_h - 110  #900 , 1000
                         WIN = pygame.display.set_mode((WIDTH, HEIGHT) , pygame.RESIZABLE)
+                        unmute_pos = pygame.Rect(WIDTH - UNMUTE.get_rect().width - 15 , 10 , UNMUTE.get_rect().width , UNMUTE.get_rect().height)  
                         pygame.mouse.set_visible(True)
                     else:
                         WIDTH , HEIGHT  = WIN_RESOLUTIONS.current_w , WIN_RESOLUTIONS.current_h
                         WIN = pygame.display.set_mode((WIDTH, HEIGHT) , pygame.FULLSCREEN | pygame.NOFRAME)
+                        unmute_pos = pygame.Rect(WIDTH - UNMUTE.get_rect().width - 15 , 10 , UNMUTE.get_rect().width , UNMUTE.get_rect().height)  
                         pygame.mouse.set_visible(False)
                     F11_times += 1 
                     
             if event.type == pygame.VIDEORESIZE:
                 WIDTH , HEIGHT = event.w , event.h
                 WIN = pygame.display.set_mode((WIDTH, HEIGHT) , pygame.RESIZABLE)
+                unmute_pos = pygame.Rect(WIDTH - UNMUTE.get_rect().width - 15 , 10 , UNMUTE.get_rect().width , UNMUTE.get_rect().height)  
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_x , mouse_y = pygame.mouse.get_pos()
+                if pygame.mouse.get_pressed()[0] and unmute_pos.left < mouse_x < unmute_pos.right and unmute_pos.top < mouse_y < unmute_pos.bottom:
+                    sound_check += 1
+                    if sound_check % 2:
+                        PAUSE_SOUND.set_volume(0.4)
+                        PRESS_SOUND.set_volume(0.5)
+                        pygame.mixer.music.unpause()
+                        # pygame.mixer.music.set_volume(0.2)
+                    else:
+                        PAUSE_SOUND.set_volume(0)
+                        PRESS_SOUND.set_volume(0)
+                        pygame.mixer.music.pause()
+                        # pygame.mixer.music.set_volume(0)
 
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER:
@@ -351,10 +377,12 @@ def pause(SCORE , VELOCITY , ARROWS_LINE_NUMBER , all_sprites):
                     if F11_times % 2:
                         WIDTH , HEIGHT = WIN_RESOLUTIONS.current_w - 700 , WIN_RESOLUTIONS.current_h - 110  #900 , 1000
                         WIN = pygame.display.set_mode((WIDTH, HEIGHT) , pygame.RESIZABLE)
+                        unmute_pos = pygame.Rect(WIDTH - UNMUTE.get_rect().width - 15 , 10 , UNMUTE.get_rect().width , UNMUTE.get_rect().height)
                         pygame.mouse.set_visible(True)
                     else:
                         WIDTH , HEIGHT  = WIN_RESOLUTIONS.current_w , WIN_RESOLUTIONS.current_h
                         WIN = pygame.display.set_mode((WIDTH, HEIGHT) , pygame.FULLSCREEN | pygame.NOFRAME)
+                        unmute_pos = pygame.Rect(WIDTH - UNMUTE.get_rect().width - 15 , 10 , UNMUTE.get_rect().width , UNMUTE.get_rect().height)
                         pygame.mouse.set_visible(False)
                     F11_times += 1 
                     for sprite in all_sprites:  # Update sprites' centerx
